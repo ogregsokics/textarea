@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Szoros keret soronként – új sor, transzparens export</title>
+  <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      background: #eee;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 600px;
+      height: 120px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      padding: 10px;
+      resize: vertical;
+    }
+
+    .controls {
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    #outputWrapper {
+      max-width: 90vw;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .line {
+      display: inline-block;
+      padding: 6px 10px;
+      background-color: black;
+      color: white;
+      font-weight: bold;
+      font-size: 24px;
+      border-radius: 0;
+      line-height: 1;
+      white-space: pre;
+      margin: 0;
+    }
+
+    .line + br {
+      line-height: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    label {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Szoros keret soronként – transzparens háttér</h2>
+
+  <textarea id="inputText">„A magyarok soha nem adják fel.”
+Orbán Viktor, 2022.10.11.</textarea>
+
+  <div class="controls">
+    <label for="fontSize">Betűméret: <span id="fontSizeLabel">24</span> px</label>
+    <input type="range" id="fontSize" min="12" max="72" value="24">
+
+    <label for="fontFamily">Betűtípus:</label>
+    <select id="fontFamily">
+      <option value="Arial">Arial</option>
+      <option value="'Staatliches', sans-serif">Staatliches</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Times New Roman">Times New Roman</option>
+    </select>
+
+    <label><input type="checkbox" id="boldCheck" checked> Félkövér</label>
+    <label><input type="checkbox" id="italicCheck"> Dőlt</label>
+    <label><input type="checkbox" id="uppercaseCheck"> Minden nagybetűvel</label>
+
+    <label for="textColor">Betűszín:</label>
+    <input type="color" id="textColor" value="#ffffff">
+
+    <label for="bgColor">Háttérszín:</label>
+    <input type="color" id="bgColor" value="#000000">
+
+    <label for="textAlign">Igazítás:</label>
+    <select id="textAlign">
+      <option value="left">Balra</option>
+      <option value="center">Középre</option>
+      <option value="right">Jobbra</option>
+    </select>
+  </div>
+
+  <div id="outputWrapper">
+    <div id="textOutput"></div>
+  </div>
+
+  <button id="saveBtn">Mentés transzparens képként</button>
+
+  <script>
+    const input = document.getElementById("inputText");
+    const output = document.getElementById("textOutput");
+    const fontSizeSlider = document.getElementById("fontSize");
+    const fontSizeLabel = document.getElementById("fontSizeLabel");
+    const fontFamilySelect = document.getElementById("fontFamily");
+    const boldCheck = document.getElementById("boldCheck");
+    const italicCheck = document.getElementById("italicCheck");
+    const uppercaseCheck = document.getElementById("uppercaseCheck");
+    const textColorInput = document.getElementById("textColor");
+    const bgColorInput = document.getElementById("bgColor");
+    const textAlignSelect = document.getElementById("textAlign");
+    const saveBtn = document.getElementById("saveBtn");
+
+    function updateText() {
+      const isUppercase = uppercaseCheck.checked;
+      const lines = input.value.split('\n');
+      output.innerHTML = '';
+
+      // <-- EZ A SOR AZ ÚJ:
+      output.style.textAlign = textAlignSelect.value;
+
+      lines.forEach((line, index) => {
+        const span = document.createElement('span');
+        span.className = 'line';
+        span.textContent = isUppercase ? line.toUpperCase() : line;
+
+        // dinamikus stílusok
+        span.style.fontSize = fontSizeSlider.value + 'px';
+        span.style.fontWeight = boldCheck.checked ? 'bold' : 'normal';
+        span.style.fontStyle = italicCheck.checked ? 'italic' : 'normal';
+        span.style.color = textColorInput.value;
+        span.style.backgroundColor = bgColorInput.value;
+        span.style.fontFamily = fontFamilySelect.value;
+
+        output.appendChild(span);
+
+        // sortörés minden sor után, kivéve az utolsó után
+        if (index < lines.length - 1) {
+          output.appendChild(document.createElement('br'));
+        }
+      });
+
+      fontSizeLabel.textContent = fontSizeSlider.value;
+    }
+
+    function refreshAll() {
+      updateText();
+    }
+
+    input.addEventListener("input", refreshAll);
+    fontSizeSlider.addEventListener("input", refreshAll);
+    fontFamilySelect.addEventListener("change", refreshAll);
+    boldCheck.addEventListener("change", refreshAll);
+    italicCheck.addEventListener("change", refreshAll);
+    uppercaseCheck.addEventListener("change", refreshAll);
+    textColorInput.addEventListener("input", refreshAll);
+    bgColorInput.addEventListener("input", refreshAll);
+    textAlignSelect.addEventListener("change", refreshAll);
+
+    saveBtn.addEventListener("click", () => {
+      html2canvas(document.getElementById("textOutput"), {
+        backgroundColor: null // transzparens háttér
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'idezet_transzparens.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    });
+
+    refreshAll();
+  </script>
+
+</body>
+</html>
