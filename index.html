@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Szoros keret soronként – új sor, transzparens export</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
@@ -73,12 +74,13 @@ Orbán Viktor, 2022.10.11.</textarea>
 
   <div class="controls">
     <label for="fontSize">Betűméret: <span id="fontSizeLabel">24</span> px</label>
-    <input type="range" id="fontSize" min="12" max="72" value="24">
+    <input type="range" id="fontSize" min="12" max="500" value="24">
 
     <label for="fontFamily">Betűtípus:</label>
     <select id="fontFamily">
       <option value="Arial">Arial</option>
       <option value="'Staatliches', sans-serif">Staatliches</option>
+      <option value="'Bebas Neue', sans-serif">Bebas Neue</option>
       <option value="Georgia">Georgia</option>
       <option value="Courier New">Courier New</option>
       <option value="Times New Roman">Times New Roman</option>
