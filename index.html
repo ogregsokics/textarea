@@ -102,6 +102,9 @@ Orbán Viktor, 2022.10.11.</textarea>
       <option value="center">Középre</option>
       <option value="right">Jobbra</option>
     </select>
+
+    <!-- Új opció -->
+    <label><input type="checkbox" id="transparentBgCheck"> Átlátszó háttér</label>
   </div>
 
   <div id="outputWrapper">
@@ -122,6 +125,7 @@ Orbán Viktor, 2022.10.11.</textarea>
     const textColorInput = document.getElementById("textColor");
     const bgColorInput = document.getElementById("bgColor");
     const textAlignSelect = document.getElementById("textAlign");
+    const transparentBgCheck = document.getElementById("transparentBgCheck");
     const saveBtn = document.getElementById("saveBtn");
 
     function updateText() {
@@ -129,7 +133,6 @@ Orbán Viktor, 2022.10.11.</textarea>
       const lines = input.value.split('\n');
       output.innerHTML = '';
 
-      // <-- EZ A SOR AZ ÚJ:
       output.style.textAlign = textAlignSelect.value;
 
       lines.forEach((line, index) => {
@@ -142,12 +145,11 @@ Orbán Viktor, 2022.10.11.</textarea>
         span.style.fontWeight = boldCheck.checked ? 'bold' : 'normal';
         span.style.fontStyle = italicCheck.checked ? 'italic' : 'normal';
         span.style.color = textColorInput.value;
-        span.style.backgroundColor = bgColorInput.value;
+        span.style.backgroundColor = transparentBgCheck.checked ? "transparent" : bgColorInput.value;
         span.style.fontFamily = fontFamilySelect.value;
 
         output.appendChild(span);
 
-        // sortörés minden sor után, kivéve az utolsó után
         if (index < lines.length - 1) {
           output.appendChild(document.createElement('br'));
         }
@@ -169,6 +171,7 @@ Orbán Viktor, 2022.10.11.</textarea>
     textColorInput.addEventListener("input", refreshAll);
     bgColorInput.addEventListener("input", refreshAll);
     textAlignSelect.addEventListener("change", refreshAll);
+    transparentBgCheck.addEventListener("change", refreshAll);
 
     saveBtn.addEventListener("click", () => {
       html2canvas(document.getElementById("textOutput"), {
