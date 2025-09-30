@@ -7,6 +7,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
+    @font-face {
+      font-family: "MacklinSansExtraLight";
+      src: url("fonts/Monotype - Macklin Sans ExtraLight.otf") format("opentype");
+    }
+
+    @font-face {
+      font-family: "MacklinSansRegular";
+      src: url("fonts/Monotype - Macklin Sans Regular.otf") format("opentype");
+    }
+
+    @font-face {
+      font-family: "MacklinSansLight";
+      src: url("fonts/Monotype - Macklin Sans Light.otf") format("opentype");
+    }
+
+    @font-face {
+      font-family: "MacklinSansBold";
+      src: url("fonts/Monotype - Macklin Sans Bold.otf") format("opentype");
+    }
+
     body {
       background: #eee;
       font-family: Arial, sans-serif;
@@ -84,6 +104,10 @@ Orbán Viktor, 2022.10.11.</textarea>
       <option value="Georgia">Georgia</option>
       <option value="Courier New">Courier New</option>
       <option value="Times New Roman">Times New Roman</option>
+      <option value="MacklinSansExtraLight">MacklinSansExtraLight</option>
+      <option value="MacklinSansRegular">MacklinSansRegular</option>
+      <option value="MacklinSansLight">MacklinSansLight</option>
+      <option value="MacklinSansBold">MacklinSansBold</option>
     </select>
 
     <label><input type="checkbox" id="boldCheck" checked> Félkövér</label>
@@ -103,7 +127,6 @@ Orbán Viktor, 2022.10.11.</textarea>
       <option value="right">Jobbra</option>
     </select>
 
-    <!-- Új opció -->
     <label><input type="checkbox" id="transparentBgCheck"> Átlátszó háttér</label>
   </div>
 
