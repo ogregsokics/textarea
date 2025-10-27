@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Szoros keret soronként – új sor, transzparens export</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
@@ -11,33 +11,26 @@
       font-family: "MacklinSansExtraLight";
       src: url("fonts/Monotype - Macklin Sans ExtraLight.otf") format("opentype");
     }
-
     @font-face {
       font-family: "MacklinSansRegular";
       src: url("fonts/Monotype - Macklin Sans Regular.otf") format("opentype");
     }
-
     @font-face {
       font-family: "MacklinSansBlack";
       src: url("fonts/Monotype - Macklin Sans Black.otf") format("opentype");
     }
-
     @font-face {
       font-family: "MacklinSansBold";
       src: url("fonts/Monotype - Macklin Sans Bold.otf") format("opentype");
     }
-
-      @font-face {
+    @font-face {
       font-family: "MacklinSansThin";
       src: url("fonts/Monotype - Macklin Sans Thin.otf") format("opentype");
     }
-
     @font-face {
       font-family: "MacklinSansHairline";
       src: url("fonts/Monotype - Macklin Sans Hairline.otf") format("opentype");
     }
-
-
 
     body {
       background: #eee;
@@ -73,23 +66,26 @@
       margin-bottom: 20px;
     }
 
+    /* Kiemelt módosítások: a sorok inline-blockként viselkednek,
+       van belső paddingjük, és a konténernek is adunk függőleges paddingot,
+       hogy az ékezetek ne lógjanak ki a képből exportkor. */
+    #textOutput {
+      padding: 8px 0; /* megakadályozza a felső/alsó levágást */
+    }
+
     .line {
-      display: inline-block;
-      padding: 6px 10px;
+      display: inline-block;       /* biztosítja, hogy a sor teljes magassága számítson */
+      padding: 6px 10px;           /* belső tér az ékezetek számára */
       background-color: black;
       color: white;
       font-weight: bold;
       font-size: 24px;
       border-radius: 0;
       line-height: 1;
-      white-space: pre;
+      white-space: pre;            /* megtartja a szóközöket */
       margin: 0;
-    }
-
-    .line + br {
-      line-height: 0;
-      margin: 0;
-      padding: 0;
+      box-sizing: border-box;      /* a padding beleszámít a box-ba */
+      vertical-align: top;         /* sorok tetején igazítás, kevesebb vizuális ugrás */
     }
 
     label {
@@ -101,11 +97,16 @@
 
   <h2>Szoros keret soronként – transzparens háttér</h2>
 
-  <textarea id="inputText"></textarea>
+  <textarea id="inputText" placeholder="Írd be a szöveget...">Árvíztűrő tükörfúrógép
+Őszi éjszaka
+Így néz ki: áéíóöőúüű</textarea>
 
   <div class="controls">
     <label for="fontSize">Betűméret: <span id="fontSizeLabel">24</span> px</label>
     <input type="range" id="fontSize" min="12" max="500" value="24">
+
+    <label for="lineSpacing">Sorköz: <span id="lineSpacingLabel">1.0</span>×</label>
+    <input type="range" id="lineSpacing" min="0.5" max="3" step="0.1" value="1.0">
 
     <label for="fontFamily">Betűtípus:</label>
     <select id="fontFamily">
@@ -163,15 +164,19 @@
     const textAlignSelect = document.getElementById("textAlign");
     const transparentBgCheck = document.getElementById("transparentBgCheck");
     const saveBtn = document.getElementById("saveBtn");
+    const lineSpacingSlider = document.getElementById("lineSpacing");
+    const lineSpacingLabel = document.getElementById("lineSpacingLabel");
 
     function updateText() {
       const isUppercase = uppercaseCheck.checked;
       const lines = input.value.split('\n');
       output.innerHTML = '';
-
       output.style.textAlign = textAlignSelect.value;
 
-      lines.forEach((line, index) => {
+      // kis segítség: a padding arányos a betűmérettel, hogy nagyobb betűnél se vágjon
+      const basePadding = Math.max(4, Math.round(fontSizeSlider.value * 0.2));
+
+      lines.forEach((line, idx) => {
         const span = document.createElement('span');
         span.className = 'line';
         span.textContent = isUppercase ? line.toUpperCase() : line;
@@ -183,15 +188,18 @@
         span.style.color = textColorInput.value;
         span.style.backgroundColor = transparentBgCheck.checked ? "transparent" : bgColorInput.value;
         span.style.fontFamily = fontFamilySelect.value;
+        // a sorköz az elem belső line-height-ját szabályozza, de padding marad, így nincs levágás
+        span.style.lineHeight = lineSpacingSlider.value;
+        span.style.padding = basePadding + 'px 12px'; // függőleges padding arányosan a betűmérettel
+        span.style.display = 'inline-block'; // biztosítjuk, hogy a teljes magasság figyelembe legyen véve
 
         output.appendChild(span);
-
-        if (index < lines.length - 1) {
-          output.appendChild(document.createElement('br'));
-        }
+        // új sorhoz <br>, de ha utolsó sor, ne adjunk fölös sortöbbletet (esztétika)
+        if (idx < lines.length - 1) output.appendChild(document.createElement('br'));
       });
 
       fontSizeLabel.textContent = fontSizeSlider.value;
+      lineSpacingLabel.textContent = lineSpacingSlider.value;
     }
 
     function refreshAll() {
@@ -208,18 +216,25 @@
     bgColorInput.addEventListener("input", refreshAll);
     textAlignSelect.addEventListener("change", refreshAll);
     transparentBgCheck.addEventListener("change", refreshAll);
+    lineSpacingSlider.addEventListener("input", refreshAll);
 
     saveBtn.addEventListener("click", () => {
+      // html2canvas export: backgroundColor: null -> transzparens
       html2canvas(document.getElementById("textOutput"), {
-        backgroundColor: null // transzparens háttér
+        backgroundColor: null,
+        scale: window.devicePixelRatio || 1
       }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'idezet_transzparens.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
+      }).catch(err => {
+        console.error('Export hiba:', err);
+        alert('Hiba történt az exportáláskor. Nézd meg a konzolt további részletekért.');
       });
     });
 
+    // kezdeti frissítés
     refreshAll();
   </script>
 
